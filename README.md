@@ -49,4 +49,4 @@ The port number depends on your `docker-compose.yml`.
 This program is released under the MIT License.
 
 © 2025 ActiveTK.  
-🔗 https://github.com/ActiveTK/gff/blob/master/LICENSE
+🔗 https://github.com/ActiveTK/MP4Recover/blob/main/LICENSE
