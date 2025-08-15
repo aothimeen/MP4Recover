@@ -1,0 +1,40 @@
+services:
+  mp4-repair:
+    image: mp4-repair-orchestrator:latest
+    container_name: mp4-repair
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+    # GPU を使う場合（NVIDIA Container Toolkit）
+    # 以下をコメントアウトしてください。
+    #
+    # deploy:
+    #  resources:
+    #    reservations:
+    #      devices:
+    #        - capabilities: ["gpu"]
+    #
+
+    volumes:
+      - ./data:/data
+    entrypoint: ["/bin/bash","-lc","mkdir -p /data/in /data/out /data/logs && chmod -R 0777 /data && exec gunicorn -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000 --workers 4 --timeout 0 app:app"]
+
+  php-web:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: php-web
+    restart: unless-stopped
+    # HTTPサーバーのポート番号(規定値は8080)
+    ports:
+      - "8080:80"
+    environment:
+      API_BASE: http://mp4-repair:8000
+      DATA_IN: /data/in
+      DATA_OUT: /data/out
+      PERMISSIVE_MODE: "1"
+    volumes:
+      - ./data:/data
+    depends_on:
+      - mp4-repair
